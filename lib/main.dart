@@ -373,6 +373,21 @@ class _CameraHomeState extends State<CameraHome> {
 
   }
 
+  Map<int, String> convertStringPolynomialToMap(String poly) {
+    SplayTreeSet<int> polynomials = new SplayTreeSet();
+    List<String> seperated = poly.split("x");
+    Map<int, String> equationMap = new Map();
+    for(String s in seperated) {
+      if(s.contains("^")) {
+
+      }
+    }
+  }
+
+  bool isDigit(String s) {
+    return "1234567890".contains(s);
+  }
+
   double evaluateWithSimpson(String a, String b, String eq) {
     Parser p = new Parser();
     Expression exp = p.parse(eq);
