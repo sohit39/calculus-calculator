@@ -10,10 +10,10 @@ import 'dart:collection';
 import 'package:math_expressions/math_expressions.dart';
 
 
-class CameraHome extends StatefulWidget {
+class Camera extends StatefulWidget {
   @override
-  _CameraHomeState createState() {
-    return new _CameraHomeState();
+  _CameraState createState() {
+    return new _CameraState();
   }
 }
 
@@ -33,7 +33,7 @@ IconData getCameraLensIcon(CameraLensDirection direction) {
 void logError(String code, String message) =>
     print('Error: $code\nError Message: $message');
 
-class _CameraHomeState extends State<CameraHome> {
+class _CameraState extends State<Camera> {
   CameraController controller;
   TextEditingController textController = new TextEditingController();
   String imagePath;
@@ -47,74 +47,136 @@ class _CameraHomeState extends State<CameraHome> {
   bool _progressBarActive = false;
   bool _simpsonBar = false;
   String simposonAnswer = "";
-
+  var count = 0;
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      key: _scaffoldKey,
-      appBar: new AppBar(
-        title: const Text('PhotoCalculus Calculator', style: TextStyle(color: Colors.black, fontSize: 20.0),),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.history),
-            onPressed: () {
-              Navigator.push(context, EquationHistory());
-            },
-          ),
-        ],
-        backgroundColor: Colors.red,
+      return new Scaffold(
+        key: _scaffoldKey,
+        appBar: new AppBar(
+          title: const Text('PhotoCalculus Calculator',
+            style: TextStyle(color: Colors.white, fontSize: 20.0),),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.history),
+              onPressed: () {
+                Navigator.push(context, EquationHistory());
+              },
+            ),
+          ],
+          backgroundColor: Colors.blue[900],
 
-      ),
-      body: new Column(
-        children: <Widget>[
-          new Expanded(
-            child: new Container(
-              child: new Padding(
-                padding: const EdgeInsets.all(1.0),
-                child: new Center(
-                  child: _cameraPreviewWidget(),
+        ),
+//        floatingActionButton: new FloatingActionButton(
+//            child: new Icon(Icons.history),
+//            onPressed: showHistory),
+//        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        body: new Column(
+          children: <Widget>[
+            new Expanded(
+              child: new Container(
+                child: new Padding(
+                  padding: const EdgeInsets.all(0.1),
+                  child: new Center(
+                    child: _cameraPreviewWidget(),
+                  ),
+                ),
+                decoration: new BoxDecoration(
+                  color: Colors.black,
+
                 ),
               ),
-              decoration: new BoxDecoration(
-                color: Colors.black,
-
-              ),
             ),
-          ),
-          _captureControlRowWidget(),
-          new Container(padding: const EdgeInsets.all(5.0),
-              child: new Text(predictedEquation,
-                style: TextStyle(color: Colors.black,
-                    fontSize: 20.0),)),
-          new Container(padding: const EdgeInsets.all(5.0),
-              child: _progressBarActive == true ? const CircularProgressIndicator(backgroundColor: Colors.red,) :new Text(answer,
-                style: TextStyle(color: Colors.black,
-                    fontSize: 20.0),)),
-          _simpsonBar == false ? new Container() : new Container(padding: const EdgeInsets.all(5.0),
-              child: _progressBarActive == true ? const CircularProgressIndicator(backgroundColor: Colors.red,) :new Text(simposonAnswer,
-                style: TextStyle(color: Colors.black,
-                    fontSize: 20.0),)),
-          new Container(color: Colors.red,
-              child: new Padding(padding: const EdgeInsets.all(5.0),
-                child: new Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    _cameraTogglesRowWidget(),
-                  _thumbnailWidget(),
-              ],
-            ),
-          )),
-        ],
-      ),
-    );
+            _captureControlRowWidget(),
+            new Container(padding: const EdgeInsets.all(5.0),
+                child: new Text(predictedEquation,
+                  style: TextStyle(color: Colors.black,
+                      fontSize: 20.0),)),
+            //if loading, display indicator, else display Text
+            new Container(padding: const EdgeInsets.all(5.0),
+                child: _progressBarActive == true
+                    ? const CircularProgressIndicator(
+                  backgroundColor: Colors.red,)
+                    : new Text(answer,
+                  style: TextStyle(color: Colors.black,
+                      fontSize: 20.0),)),
+            _simpsonBar == false ? new Container() : new Container(
+                padding: const EdgeInsets.all(5.0),
+                child: _progressBarActive == true
+                    ? const CircularProgressIndicator(
+                  backgroundColor: Colors.red,)
+                    : new Container(
+                    color: Colors.blue[200], child: new Text(simposonAnswer,
+                  style: TextStyle(color: Colors.black,
+                      fontSize: 20.0),))),
+            /*new Container(color: Colors.blue[900],
+                child: new Padding(padding: const EdgeInsets.all(5.0),
+                  child: new Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      _cameraTogglesRowWidget(),
+                      _thumbnailWidget(),
+                    ],
+                  ),
+                )),*/
+          ],
+        ),
+      );
   }
+  void showHistory() {
+    Navigator.push(context, EquationHistory());
+  }
+  int hexToInt(String hex)
+  {
+    int val = 0;
+    int len = hex.length;
+    for (int i = 0; i < len; i++) {
+      int hexDigit = hex.codeUnitAt(i);
+      if (hexDigit >= 48 && hexDigit <= 57) {
+        val += (hexDigit - 48) * (1 << (4 * (len - 1 - i)));
+      } else if (hexDigit >= 65 && hexDigit <= 70) {
+        // A..F
+        val += (hexDigit - 55) * (1 << (4 * (len - 1 - i)));
+      } else if (hexDigit >= 97 && hexDigit <= 102) {
+        // a..f
+        val += (hexDigit - 87) * (1 << (4 * (len - 1 - i)));
+      } else {
+        throw new FormatException("Invalid hexadecimal value");
+      }
+    }
+    return val;
+  }
+  void initializeCam() async {
+    CameraDescription a = new CameraDescription(name: "0", lensDirection: CameraLensDirection.back);
+    controller = new CameraController(a, ResolutionPreset.high);
+    if (controller != null) {
+      await controller.dispose();
+    }
+    controller = new CameraController(a, ResolutionPreset.high);
+    // If the controller is updated then update the UI.
+    controller.addListener(() {
+      if (mounted) setState(() {});
+      if (controller.value.hasError) {
+        showInSnackBar('Camera error ${controller.value.errorDescription}');
+      }
+    });
 
+    try {
+      await controller.initialize();
+    } on CameraException catch (e) {
+      _showCameraException(e);
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
   /// Display the preview from the camera (or a message if the preview is not available).
   Widget _cameraPreviewWidget() {
-    if (controller == null || !controller.value.isInitialized) {
+    if (controller == null || !controller.value.isInitialized && cameras.length > 0) {
+      initializeCam();
       return const Text(
-        'Tap a camera',
+        'No Camera Available',
         style: const TextStyle(
           color: Colors.white,
           fontSize: 24.0,
@@ -122,15 +184,17 @@ class _CameraHomeState extends State<CameraHome> {
         ),
       );
     } else {
-      return new AspectRatio(
-        aspectRatio: controller.value.aspectRatio,
-        child: new CameraPreview(controller),
-      );
+      return new CameraPreview(controller);
+//      return new AspectRatio(
+//        aspectRatio: controller.value.aspectRatio,
+//        child: new CameraPreview(controller),
+//      );
     }
+
   }
 
   /// Display the thumbnail of the captured image or video.
-  Widget _thumbnailWidget() {
+  /*Widget _thumbnailWidget() {
     return new Expanded(
       child: new Align(
         alignment: Alignment.centerRight,
@@ -155,18 +219,18 @@ class _CameraHomeState extends State<CameraHome> {
         ),
       ),
     );
-  }
+  }*/
 
   /// Display the control bar with buttons to take pictures and record videos.
   Widget _captureControlRowWidget() {
-    return new Container(color: Colors.red,child: new Row(
+    return new Container(color: Colors.blue[900],child: new Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       mainAxisSize: MainAxisSize.max,
       children: <Widget>[
         new IconButton(
           icon: const Icon(Icons.camera_alt),
           iconSize: 45.0,
-          color: Colors.black,
+          color: Colors.white,
           onPressed: controller != null &&
               controller.value.isInitialized &&
               !controller.value.isRecordingVideo
@@ -178,7 +242,7 @@ class _CameraHomeState extends State<CameraHome> {
   }
 
   /// Display a row of toggle to select the camera (or a message if no camera is available).
-  Widget _cameraTogglesRowWidget() {
+  /*Widget _cameraTogglesRowWidget() {
     final List<Widget> toggles = <Widget>[];
 
     if (cameras.isEmpty) {
@@ -204,7 +268,7 @@ class _CameraHomeState extends State<CameraHome> {
     }
 
     return new Row(children: toggles);
-  }
+  }*/
 
   String timestamp() => new DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -250,7 +314,7 @@ class _CameraHomeState extends State<CameraHome> {
           videoController = null;
         });
         if (filePath != null) {
-          showInSnackBar('Picture saved to $filePath');
+          //showInSnackBar('Picture saved to $filePath');
           callMathPixApi(imagePath);
         }
 
@@ -258,30 +322,34 @@ class _CameraHomeState extends State<CameraHome> {
     });
   }
 
+  //calls the MathPix API and sends the JSON to a helper method
   void callMathPixApi(String imagePath) {
-      setState(() {
-        _progressBarActive = true;
-      });
-      File imageFile = new File(imagePath);
-      List<int> imageBytes = imageFile.readAsBytesSync();
-      Base64Encoder a = new Base64Encoder();
-      String base64 = a.convert(imageBytes);
-      JsonEncoder a2 = new JsonEncoder();
-      var body = a2.convert({'src': "data:image/jpeg;base64," + base64});
-      print(base64);
+    setState(() {
+      _progressBarActive = true;
+    });
+    //conversion into Base64
+    File imageFile = new File(imagePath);
+    List<int> imageBytes = imageFile.readAsBytesSync();
+    Base64Encoder base64Encoder = new Base64Encoder();
+    String base64 = base64Encoder.convert(imageBytes);
+    JsonEncoder jsonEncoder = new JsonEncoder();
+    var body = jsonEncoder.convert({'src': "data:image/jpeg;base64," + base64});
+    print(base64);
 
-      var url = "https://api.mathpix.com/v3/latex/";
-      http.post(
-          url,
-          headers: {'app-id': 'gatiganti44914_sas_edu_sg',
-            'app_key': '452f9b9e710f6e03b263',
-            'Content-Type': 'application/json'},
-          body: body).then(handleSuccess).catchError(handleFailure);
+    var url = "https://api.mathpix.com/v3/latex/";
+    http.post(
+        url,
+        headers: {'app-id': 'gatiganti44914_sas_edu_sg',
+          'app_key': '452f9b9e710f6e03b263',
+          'Content-Type': 'application/json'},
+        body: body).then(handleSuccess).catchError(handleFailure);
   }
 
+  //handles the JSON file received from MathPix, and analyzes whether it really is a calculus equation or not
   handleSuccess(http.Response response) {
     print('it worked!');
     print(response.body);
+    //Map of possible types of pictures.
     Map<num, String> POSSIBLES = new Map();
     POSSIBLES[-999] = "Sorry, I do not recognise this equation";
     POSSIBLES[0] = "I can evaluate this. Please Wait";
@@ -308,7 +376,7 @@ class _CameraHomeState extends State<CameraHome> {
     print('Something went wrong.');
     print(error.message);
   }
-
+  //Uses MathPix JSON probabilites and confidences in order to predict whether it really is a math equation.
   int evaluateExpressionType(String s) {
     JsonDecoder decoder = new JsonDecoder();
     Map data = decoder.convert(s);
@@ -332,14 +400,16 @@ class _CameraHomeState extends State<CameraHome> {
     }
   }
 
-  double evaluateLatexExpression(String jsonString) {
+  //if MathPix call was successful, the resulting LaTex goes to this method and is converted into the necessary format for Newton
+  //e.g. \\int _ {0} ^ {2} x^2 has to be converted into /area/0:2|x^2
+  void evaluateLatexExpression(String jsonString) {
     JsonDecoder decoder = new JsonDecoder();
     Map data = decoder.convert(jsonString);
     String latex = data["latex"];
     String OPERATION = "";
     int operationLength = 0;
     Map<String, String> OPERATIONS = new Map();
-    //OPERATIONS["\\int _ {"] = "area/";
+    OPERATIONS["\\int _ {"] = "area/";
     OPERATIONS["\\int"] = "integrate/";
     OPERATIONS["\\frac { d } { d x }"] = "derive/";
     for(String s in OPERATIONS.keys) {
@@ -351,6 +421,7 @@ class _CameraHomeState extends State<CameraHome> {
     }
     String arg = "";
     String equation = latex.substring(operationLength);
+    //if it is a definite integral
     if(equation.contains("_") || OPERATION == "area/") {
       OPERATION = "area/";
       List terms = findEquationWithBounds(equation);
@@ -373,21 +444,10 @@ class _CameraHomeState extends State<CameraHome> {
 
   }
 
-  Map<int, String> convertStringPolynomialToMap(String poly) {
-    SplayTreeSet<int> polynomials = new SplayTreeSet();
-    List<String> seperated = poly.split("x");
-    Map<int, String> equationMap = new Map();
-    for(String s in seperated) {
-      if(s.contains("^")) {
-
-      }
-    }
-  }
-
   bool isDigit(String s) {
     return "1234567890".contains(s);
   }
-
+  //Since Newton had some trouble evaluating definite integrals, I wrote the Simpson's Method, which is how calculators evaluate definite integrals
   double evaluateWithSimpson(String a, String b, String eq) {
     Parser p = new Parser();
     Expression exp = p.parse(eq);
@@ -398,19 +458,17 @@ class _CameraHomeState extends State<CameraHome> {
     ContextModel cm = new ContextModel();
     ContextModel cm2 = new ContextModel();
     int N = 15000;
-
     double h = (double.parse(b) - double.parse(a)) / (N - 1);
     cm.bindVariable(xa, new Number(aNum)); cm2.bindVariable(xb, new Number(bNum));
     double sum = 1.0 / 3.0 * (exp.evaluate(EvaluationType.REAL, cm) + exp.evaluate(EvaluationType.REAL, cm));
-
     for (int i = 1; i < N - 1; i += 2) {
-      double x = aNum + h * i;
-      cm.bindVariable(xa, new Number(x));
+      double input = aNum + h * i;
+      cm.bindVariable(xa, new Number(input));
       sum += 4.0 / 3.0 * exp.evaluate(EvaluationType.REAL, cm);
     }
     for (int i = 2; i < N - 1; i += 2) {
-      double x = aNum + h * i;
-      cm.bindVariable(xa, new Number(x));
+      double input = aNum + h * i;
+      cm.bindVariable(xa, new Number(input));
       sum += 2.0 / 3.0 * exp.evaluate(EvaluationType.REAL, cm);
     }
     print("SIMPSON: " + (sum*h).toString());
@@ -429,7 +487,7 @@ class _CameraHomeState extends State<CameraHome> {
     String answer2 = data["result"];
     print("NewtonSimplify:" + answer2);
   }
-
+  //cleans up the equation so Newton or my other methods can understand it
   String findEquation(String equation, bool area) {
     equation = equation.replaceAll("{", "");
     equation = equation.replaceAll("}", "");
@@ -438,16 +496,18 @@ class _CameraHomeState extends State<CameraHome> {
     equation = equation.replaceAll("\\cdot", "*");
     equation = equation.replaceAll("\\operatorname", "");
     equation = equation.replaceAll("\\", "");
+    //so there is a bracket for the equation/terms following the square root.
     if(equation.contains("sqrt"))
       equation = equation.substring(0, equation.indexOf("sqrt") + 4) + "(" + equation.substring(equation.indexOf("sqrt") + 4) + ")";
     print(equation);
-      setState(() {
-        predictedEquation = "Predicted: " + equation;
-      });
+    setState(() {
+      predictedEquation = "Predicted: " + equation;
+    });
 
     return equation;
   }
 
+  //converts the LaTex form of a bounded integral into an Array of terms
   List findEquationWithBounds(String equation) {
     equation = equation.replaceAll("{", "");
     equation = equation.replaceAll("}", "");
@@ -455,14 +515,14 @@ class _CameraHomeState extends State<CameraHome> {
     //equation = equation.replaceAll("operatorname", "");
     List equationWithBounds = new List(3);
     equationWithBounds[0] = equation.substring(
-      equation.indexOf("_") + 3,
-      equation.indexOf("^") - 1
+        equation.indexOf("_") + 3,
+        equation.indexOf("^") - 1
     );
     print(equationWithBounds[0]);
     int ind = equation.indexOf(" ", equation.indexOf("^") + 3);
     equationWithBounds[1] = equation.substring(
-      equation.indexOf("^") + 3,
-      equation.indexOf(" ", equation.indexOf("^") + 3)
+        equation.indexOf("^") + 3,
+        equation.indexOf(" ", equation.indexOf("^") + 3)
     );
     print(equationWithBounds[1]);
     equationWithBounds[2] = findEquation(equation.substring(ind+1), true);
@@ -478,93 +538,12 @@ class _CameraHomeState extends State<CameraHome> {
       answer = answer2;
       _progressBarActive = false;
     });
-
+    //must addFirst as we are implementing a Stack using a Queue.
     EquationHistory.equations.addFirst(new ListTile(
       leading: new Icon(Icons.check_circle),
       title: new Text(operationForListView),
       subtitle: new Text(predictedEquation + " Answer: " + answer2),
     ));
-  }
-
-
-
-
-  void onVideoRecordButtonPressed() {
-    startVideoRecording().then((String filePath) {
-      if (mounted) setState(() {});
-      if (filePath != null) showInSnackBar('Saving video to $filePath');
-    });
-  }
-
-  void onStopButtonPressed() {
-    stopVideoRecording().then((_) {
-      if (mounted) setState(() {});
-      showInSnackBar('Video recorded to: $videoPath');
-    });
-  }
-
-  Future<String> startVideoRecording() async {
-    if (!controller.value.isInitialized) {
-      showInSnackBar('Error: select a camera first.');
-      return null;
-    }
-
-    final Directory extDir = await getApplicationDocumentsDirectory();
-    final String dirPath = '${extDir.path}/Movies/flutter_test';
-    await new Directory(dirPath).create(recursive: true);
-    final String filePath = '$dirPath/${timestamp()}.mp4';
-
-    if (controller.value.isRecordingVideo) {
-      // A recording is already started, do nothing.
-      return null;
-    }
-
-    try {
-      videoPath = filePath;
-      await controller.startVideoRecording(filePath);
-    } on CameraException catch (e) {
-      _showCameraException(e);
-      return null;
-    }
-    return filePath;
-  }
-
-  Future<void> stopVideoRecording() async {
-    if (!controller.value.isRecordingVideo) {
-      return null;
-    }
-
-    try {
-      await controller.stopVideoRecording();
-    } on CameraException catch (e) {
-      _showCameraException(e);
-      return null;
-    }
-
-    await _startVideoPlayer();
-  }
-
-  Future<void> _startVideoPlayer() async {
-    final VideoPlayerController vcontroller =
-    new VideoPlayerController.file(new File(videoPath));
-    videoPlayerListener = () {
-      if (videoController != null && videoController.value.size != null) {
-        // Refreshing the state to update video player with the correct ratio.
-        if (mounted) setState(() {});
-        videoController.removeListener(videoPlayerListener);
-      }
-    };
-    vcontroller.addListener(videoPlayerListener);
-    await vcontroller.setLooping(true);
-    await vcontroller.initialize();
-    await videoController?.dispose();
-    if (mounted) {
-      setState(() {
-        imagePath = null;
-        videoController = vcontroller;
-      });
-    }
-    await vcontroller.play();
   }
 
   Future<String> takePicture() async {
@@ -576,12 +555,9 @@ class _CameraHomeState extends State<CameraHome> {
     final String dirPath = '${extDir.path}/Pictures/flutter_test';
     await new Directory(dirPath).create(recursive: true);
     final String filePath = '$dirPath/${timestamp()}.jpg';
-
     if (controller.value.isTakingPicture) {
-      // A capture is already pending, do nothing.
       return null;
     }
-
     try {
       await controller.takePicture(filePath);
     } on CameraException catch (e) {
@@ -601,7 +577,7 @@ class CameraApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      home: new CameraHome(),
+      home: new Camera(),
     );
   }
 }
@@ -618,6 +594,7 @@ Future<Null> main() async {
   runApp(new CameraApp());
 }
 
+//class that shows the equation history page and contains the Stack for the history (Stack implemented as Queue).
 class EquationHistory extends MaterialPageRoute<Null> {
   static Queue<Widget> equations = new Queue();
   EquationHistory() : super(builder: (BuildContext ctx) {
@@ -627,9 +604,9 @@ class EquationHistory extends MaterialPageRoute<Null> {
         backgroundColor: Colors.red,
       ),
       body: new ListView(
-        shrinkWrap: true,
-        padding: const EdgeInsets.all(20.0),
-        children: equations.toList()
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(20.0),
+          children: equations.toList()
       ),
     );
   });
