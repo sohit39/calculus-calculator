@@ -62,3 +62,16 @@ flutter:
   #
   # For details regarding fonts from package dependencies, 
   # see https://flutter.io/custom-fonts/#from-packages
+  fonts:
+    - family: Raleway
+      fonts:
+        - asset: fonts/Raleway-Thin.ttf
+    - family: Raleway2
+      fonts:
+        - asset: fonts/Raleway-Bold.ttf
+    - family: Raleway3
+      fonts:
+        - asset: fonts/Raleway-Medium.ttf
+
+  assets:
+    - assets/rotatedevice.gif
