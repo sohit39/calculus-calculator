@@ -48,66 +48,69 @@ class _CameraState extends State<Camera> {
   bool _simpsonBar = false;
   String simposonAnswer = "";
   var count = 0;
+  bool showLoader = false;
   @override
   Widget build(BuildContext context) {
       return new Scaffold(
         key: _scaffoldKey,
-        appBar: new AppBar(
-          title: const Text('PhotoCalculus Calculator',
-            style: TextStyle(color: Colors.white, fontSize: 20.0),),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.history),
-              onPressed: () {
-                Navigator.push(context, EquationHistory());
-              },
-            ),
-          ],
-          backgroundColor: Colors.blue[900],
-
-        ),
-//        floatingActionButton: new FloatingActionButton(
-//            child: new Icon(Icons.history),
-//            onPressed: showHistory),
-//        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        body: new Column(
+//        appBar: new AppBar(
+//          title: const Text('PhotoCalculus Calculator',
+//            style: TextStyle(color: Colors.white, fontSize: 20.0),),
+//          actions: <Widget>[
+//            IconButton(
+//              icon: Icon(Icons.history),
+//              onPressed: () {
+//                Navigator.push(context, EquationHistory());
+//              },
+//            ),
+//          ],
+//          backgroundColor: Colors.blue[900],
+//
+//        ),
+        floatingActionButton: new FloatingActionButton(
+            child: new Icon(Icons.history),
+            onPressed: () {
+              Navigator.push(context, EquationHistory());
+            },
+            backgroundColor: Colors.blue[900],),
+        floatingActionButtonLocation: const _StartTopFloatingActionButtonLocation(),
+        body: new Stack(children: <Widget>[new Column(
           children: <Widget>[
             new Expanded(
               child: new Container(
                 child: new Padding(
-                  padding: const EdgeInsets.all(0.1),
+                  padding: const EdgeInsets.all(1.0),
                   child: new Center(
                     child: _cameraPreviewWidget(),
                   ),
                 ),
                 decoration: new BoxDecoration(
-                  color: Colors.black,
+                  color: Colors.blue[900],
 
                 ),
               ),
             ),
-            _captureControlRowWidget(),
-            new Container(padding: const EdgeInsets.all(5.0),
-                child: new Text(predictedEquation,
-                  style: TextStyle(color: Colors.black,
-                      fontSize: 20.0),)),
-            //if loading, display indicator, else display Text
-            new Container(padding: const EdgeInsets.all(5.0),
-                child: _progressBarActive == true
-                    ? const CircularProgressIndicator(
-                  backgroundColor: Colors.red,)
-                    : new Text(answer,
-                  style: TextStyle(color: Colors.black,
-                      fontSize: 20.0),)),
-            _simpsonBar == false ? new Container() : new Container(
-                padding: const EdgeInsets.all(5.0),
-                child: _progressBarActive == true
-                    ? const CircularProgressIndicator(
-                  backgroundColor: Colors.red,)
-                    : new Container(
-                    color: Colors.blue[200], child: new Text(simposonAnswer,
-                  style: TextStyle(color: Colors.black,
-                      fontSize: 20.0),))),
+//            new Container(padding: const EdgeInsets.all(5.0),
+//                child: new Text(predictedEquation,
+//                  style: TextStyle(color: Colors.black,
+//                      fontSize: 20.0,),),  ),
+//            //if loading, display indicator, else display Text
+//            new Container(padding: const EdgeInsets.all(5.0),
+//                child: _progressBarActive == true
+//                    ? const CircularProgressIndicator(
+//                  backgroundColor: Colors.red,)
+//                    : new Text(answer,
+//                  style: TextStyle(color: Colors.black,
+//                      fontSize: 20.0),)),
+//            _simpsonBar == false ? new Container() : new Container(
+//                padding: const EdgeInsets.all(5.0),
+//                child: _progressBarActive == true
+//                    ? const CircularProgressIndicator(
+//                  backgroundColor: Colors.red,)
+//                    : new Container(
+//                    color: Colors.blue[200], child: new Text(simposonAnswer,
+//                  style: TextStyle(color: Colors.black,
+//                      fontSize: 20.0),))),
             /*new Container(color: Colors.blue[900],
                 child: new Padding(padding: const EdgeInsets.all(5.0),
                   child: new Row(
@@ -120,6 +123,10 @@ class _CameraState extends State<Camera> {
                   ),
                 )),*/
           ],
+        )]),
+        bottomNavigationBar: new BottomAppBar(
+          color: Colors.blue[900],
+          child:  _captureControlRowWidget(),
         ),
       );
   }
@@ -147,7 +154,15 @@ class _CameraState extends State<Camera> {
     return val;
   }
   void initializeCam() async {
-    CameraDescription a = new CameraDescription(name: "0", lensDirection: CameraLensDirection.back);
+    CameraDescription a;
+    if (Platform.operatingSystem == "android") {
+      a = new CameraDescription(
+          name: "0", lensDirection: CameraLensDirection.back);
+    }
+    else {
+      a = new CameraDescription(
+          name: "com.apple.avfoundation.avcapturedevice.built-in_video:0", lensDirection: CameraLensDirection.back);
+    }
     controller = new CameraController(a, ResolutionPreset.high);
     if (controller != null) {
       await controller.dispose();
@@ -173,6 +188,8 @@ class _CameraState extends State<Camera> {
   }
   /// Display the preview from the camera (or a message if the preview is not available).
   Widget _cameraPreviewWidget() {
+    print(cameras.length);
+    print(cameras[0]);
     if (controller == null || !controller.value.isInitialized && cameras.length > 0) {
       initializeCam();
       return const Text(
@@ -223,22 +240,18 @@ class _CameraState extends State<Camera> {
 
   /// Display the control bar with buttons to take pictures and record videos.
   Widget _captureControlRowWidget() {
-    return new Container(color: Colors.blue[900],child: new Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        new IconButton(
-          icon: const Icon(Icons.camera_alt),
-          iconSize: 45.0,
+    return
+        showLoader ? new CircularProgressIndicator() : new IconButton(
           color: Colors.white,
+          highlightColor: Colors.blue[900],
+          icon: const Icon(Icons.camera_alt),
+          iconSize: 40.0,
           onPressed: controller != null &&
               controller.value.isInitialized &&
               !controller.value.isRecordingVideo
               ? onTakePictureButtonPressed
               : null,
-        ),
-      ],
-    ));
+        );
   }
 
   /// Display a row of toggle to select the camera (or a message if no camera is available).
@@ -312,6 +325,7 @@ class _CameraState extends State<Camera> {
           imagePath = filePath;
           videoController?.dispose();
           videoController = null;
+          showLoader = true;
         });
         if (filePath != null) {
           //showInSnackBar('Picture saved to $filePath');
@@ -327,6 +341,7 @@ class _CameraState extends State<Camera> {
     setState(() {
       _progressBarActive = true;
     });
+
     //conversion into Base64
     File imageFile = new File(imagePath);
     List<int> imageBytes = imageFile.readAsBytesSync();
@@ -369,7 +384,7 @@ class _CameraState extends State<Camera> {
         _progressBarActive = false;
       });
     }
-
+    showAnswers();
   }
 
   handleFailure(error) {
@@ -398,6 +413,7 @@ class _CameraState extends State<Camera> {
     else {
       return -999;
     }
+
   }
 
   //if MathPix call was successful, the resulting LaTex goes to this method and is converted into the necessary format for Newton
@@ -515,7 +531,7 @@ class _CameraState extends State<Camera> {
     //equation = equation.replaceAll("operatorname", "");
     List equationWithBounds = new List(3);
     equationWithBounds[0] = equation.substring(
-        equation.indexOf("_") + 3,
+        equation.indexOf("_") + 2,
         equation.indexOf("^") - 1
     );
     print(equationWithBounds[0]);
@@ -534,10 +550,15 @@ class _CameraState extends State<Camera> {
     JsonDecoder decoder = new JsonDecoder();
     Map data = decoder.convert(response.body);
     String answer2 = data["result"];
+    print(answer2);
     setState(() {
+      print("here");
       answer = answer2;
+      print(answer);
       _progressBarActive = false;
     });
+    showAnswers();
+
     //must addFirst as we are implementing a Stack using a Queue.
     EquationHistory.equations.addFirst(new ListTile(
       leading: new Icon(Icons.check_circle),
@@ -571,6 +592,35 @@ class _CameraState extends State<Camera> {
     logError(e.code, e.description);
     showInSnackBar('Error: ${e.code}\n${e.description}');
   }
+  void showAnswers() {
+    String finalText = "";
+    setState(() {
+      showLoader = false;
+    });
+    if(!(predictedEquation == "Predicted Equation"))
+      finalText+=predictedEquation+ "\n";
+    finalText+= "Answer: " + answer;
+    print("ASNWER: " + answer);
+
+    if(_simpsonBar == true)
+      finalText+= "\n" + "Simpson's Method: " + double.parse(simposonAnswer.substring(simposonAnswer.indexOf(":") + 1)).toStringAsFixed(3);
+    showModalBottomSheet<void>(
+        context: context, 
+        builder: (BuildContext context) {
+          return new Container(
+              child: new Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: new Text(finalText,
+                      textAlign: TextAlign.center,
+                      style: new TextStyle(
+                          color: Colors.blue[900],
+                          fontSize: 18.0
+                      )
+                  )
+              )
+        );
+    });
+  }
 }
 
 class CameraApp extends StatelessWidget {
@@ -599,9 +649,10 @@ class EquationHistory extends MaterialPageRoute<Null> {
   static Queue<Widget> equations = new Queue();
   EquationHistory() : super(builder: (BuildContext ctx) {
     return new Scaffold(
+      backgroundColor: Colors.blue[900],
       appBar: new AppBar(
         title: new Text('Your Equation History'),
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.black,
       ),
       body: new ListView(
           shrinkWrap: true,
@@ -610,4 +661,61 @@ class EquationHistory extends MaterialPageRoute<Null> {
       ),
     );
   });
+}
+
+
+//From Flutter Example Gallery
+// Places the Floating Action Button at the top of the content area of the
+// app, on the border between the body and the app bar.
+class _StartTopFloatingActionButtonLocation extends FloatingActionButtonLocation {
+  const _StartTopFloatingActionButtonLocation();
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    // First, we'll place the X coordinate for the Floating Action Button
+    // at the start of the screen, based on the text direction.
+    double fabX;
+    assert(scaffoldGeometry.textDirection != null);
+    switch (scaffoldGeometry.textDirection) {
+      case TextDirection.rtl:
+      // In RTL layouts, the start of the screen is on the right side,
+      // and the end of the screen is on the left.
+      //
+      // We need to align the right edge of the floating action button with
+      // the right edge of the screen, then move it inwards by the designated padding.
+      //
+      // The Scaffold's origin is at its top-left, so we need to offset fabX
+      // by the Scaffold's width to get the right edge of the screen.
+      //
+      // The Floating Action Button's origin is at its top-left, so we also need
+      // to subtract the Floating Action Button's width to align the right edge
+      // of the Floating Action Button instead of the left edge.
+        final double startPadding = kFloatingActionButtonMargin + scaffoldGeometry.minInsets.right;
+        fabX = scaffoldGeometry.scaffoldSize.width - scaffoldGeometry.floatingActionButtonSize.width - startPadding;
+        break;
+      case TextDirection.ltr:
+      // In LTR layouts, the start of the screen is on the left side,
+      // and the end of the screen is on the right.
+      //
+      // Placing the fabX at 0.0 will align the left edge of the
+      // Floating Action Button with the left edge of the screen, so all
+      // we need to do is offset fabX by the designated padding.
+        final double startPadding = kFloatingActionButtonMargin + scaffoldGeometry.minInsets.left;
+        fabX = startPadding;
+        break;
+    }
+    // Finally, we'll place the Y coordinate for the Floating Action Button
+    // at the top of the content body.
+    //
+    // We want to place the middle of the Floating Action Button on the
+    // border between the Scaffold's app bar and its body. To do this,
+    // we place fabY at the scaffold geometry's contentTop, then subtract
+    // half of the Floating Action Button's height to place the center
+    // over the contentTop.
+    //
+    // We don't have to worry about which way is the top like we did
+    // for left and right, so we place fabY in this one-liner.
+    final double fabY = 25 + scaffoldGeometry.contentTop - (scaffoldGeometry.floatingActionButtonSize.height / 2.0)*0.0;
+    return new Offset(fabX, fabY);
+  }
 }
