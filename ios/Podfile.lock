@@ -9,7 +9,7 @@ PODS:
 
 DEPENDENCIES:
   - camera (from `Pods/.symlinks/plugins/camera/ios`)
-  - Flutter (from `Pods/.symlinks/flutter/ios-profile`)
+  - Flutter (from `Pods/.symlinks/flutter/ios`)
   - path_provider (from `Pods/.symlinks/plugins/path_provider/ios`)
   - video_player (from `Pods/.symlinks/plugins/video_player/ios`)
 
@@ -17,7 +17,7 @@ EXTERNAL SOURCES:
   camera:
     :path: Pods/.symlinks/plugins/camera/ios
   Flutter:
-    :path: Pods/.symlinks/flutter/ios-profile
+    :path: Pods/.symlinks/flutter/ios
   path_provider:
     :path: Pods/.symlinks/plugins/path_provider/ios
   video_player:

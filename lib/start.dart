@@ -24,10 +24,10 @@ class _StartPageState extends State<StartPage> {
                 //Image.asset('assets/new-green-hollow-circle.png', width: 100.0, height: 100.0,),
                 SizedBox(height: 16.0),
                 Text(
-                  'The Calculus Calculator',
+                  'PhotoCalculus',
                   style: TextStyle(
                       fontFamily: "Raleway",
-                      fontSize: 55.0,
+                      fontSize: 40.0,
                       color: Colors.white,
 
                   ),

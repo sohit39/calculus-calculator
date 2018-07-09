@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_player/video_player.dart';
 import 'dart:collection';
 import 'package:math_expressions/math_expressions.dart';
 import 'start.dart';
@@ -38,9 +37,6 @@ class _CameraState extends State<Camera> {
   CameraController controller;
   TextEditingController textController = new TextEditingController();
   String imagePath;
-  String videoPath;
-  VideoPlayerController videoController;
-  VoidCallback videoPlayerListener;
   String answer = "Answer";
   String predictedEquation = "Predicted Equation";
   String operationForListView = "";
@@ -323,8 +319,6 @@ class _CameraState extends State<Camera> {
       if (mounted) {
         setState(() {
           imagePath = filePath;
-          videoController?.dispose();
-          videoController = null;
           showLoader = true;
         });
         if (filePath != null) {
@@ -651,10 +645,10 @@ class EquationHistory extends MaterialPageRoute<Null> {
   static Queue<Widget> equations = new Queue();
   EquationHistory() : super(builder: (BuildContext ctx) {
     return new Scaffold(
-      backgroundColor: Colors.blue[900],
+      backgroundColor: Colors.white,
       appBar: new AppBar(
         title: new Text('Your Equation History'),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.blue[900],
       ),
       body: new ListView(
           shrinkWrap: true,
