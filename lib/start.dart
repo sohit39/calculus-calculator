@@ -21,13 +21,14 @@ class _StartPageState extends State<StartPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                //Image.asset('assets/new-green-hollow-circle.png', width: 100.0, height: 100.0,),
-                SizedBox(height: 16.0),
+                SizedBox(height: 20.0),
+                Image.asset('assets/sohitlogo.png', width: 200.0, height: 200.0,),
+                SizedBox(height: 10.0),
                 Text(
                   'PhotoCalculus',
                   style: TextStyle(
                       fontFamily: "Raleway",
-                      fontSize: 40.0,
+                      fontSize: 49.0,
                       color: Colors.white,
 
                   ),
@@ -45,17 +46,6 @@ class _StartPageState extends State<StartPage> {
                 textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 10.0,),
-                Text(
-                  "Phone MUST be rotated 90 degrees to the left when taking photos",
-                  style: TextStyle(
-                    fontFamily: "Raleway2",
-                    fontSize: 19.0,
-                    color: Colors.white,
-
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Image.asset('assets/rotatedevice.gif', height: 200.0,)
 
               ],
             ),

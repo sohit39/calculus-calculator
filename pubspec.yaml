@@ -10,6 +10,7 @@ dependencies:
   http: "^0.11.3+16"
   cryptoutils: "^0.3.0"
   math_expressions: "^0.3.0"
+  image: "^2.0.4"
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -75,3 +76,4 @@ flutter:
 
   assets:
     - assets/rotatedevice.gif
+    - assets/sohitlogo.png

@@ -255,7 +255,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh",
-				"${PODS_ROOT}/.symlinks/flutter/ios/Flutter.framework",
+				"${PODS_ROOT}/.symlinks/flutter/ios-profile/Flutter.framework",
 				"${BUILT_PRODUCTS_DIR}/camera/camera.framework",
 				"${BUILT_PRODUCTS_DIR}/path_provider/path_provider.framework",
 				"${BUILT_PRODUCTS_DIR}/video_player/video_player.framework",

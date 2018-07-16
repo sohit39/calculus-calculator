@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:image/image.dart' as images;
 import 'package:http/http.dart' as http;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -339,6 +340,13 @@ class _CameraState extends State<Camera> {
     //conversion into Base64
     File imageFile = new File(imagePath);
     List<int> imageBytes = imageFile.readAsBytesSync();
+    if(MediaQuery.of(context).orientation == Orientation.portrait) {
+      images.Image ab = images.decodeImage(imageFile.readAsBytesSync());
+      ab = images.copyRotate(ab, 90);
+      imageBytes = images.encodeJpg(ab);
+      print("herro im heere");
+    }
+
     Base64Encoder base64Encoder = new Base64Encoder();
     String base64 = base64Encoder.convert(imageBytes);
     JsonEncoder jsonEncoder = new JsonEncoder();
