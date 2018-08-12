@@ -28,7 +28,7 @@ class _StartPageState extends State<StartPage> {
                   'PhotoCalculus',
                   style: TextStyle(
                       fontFamily: "Raleway",
-                      fontSize: 49.0,
+                      fontSize: 40.0,
                       color: Colors.white,
 
                   ),
