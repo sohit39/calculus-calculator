@@ -357,7 +357,7 @@ class _CameraState extends State<Camera> {
     http.post(
         url,
         headers: {'app-id': 'gatiganti44914_sas_edu_sg',
-          'app_key': '452f9b9e710f6e03b263',
+          'app_key': '452f9b9e710f6e04c263',
           'Content-Type': 'application/json'},
         body: body).then(handleSuccess).catchError(handleFailure);
   }
